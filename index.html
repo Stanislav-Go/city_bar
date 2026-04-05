@@ -7,9 +7,36 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <style>
         #panorama { width: 100%; height: 100vh; }
-        body { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
 
-        /* Стиль анимированной точки */
+        /* Кнопка управления музыкой */
+        #mute-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            font-size: 22px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        #mute-button:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Анимированная точка перехода */
         .custom-hotspot {
             height: 40px;
             width: 40px;
@@ -23,17 +50,17 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
 
-        /* Символ стрелки внутри, развернутый вверх */
+        /* Стрелка внутри (смотрит вверх) */
         .custom-hotspot::after {
-            content: '➜'; /* Оставляем тот же символ */
+            content: '➜';
             color: white;
             font-size: 18px;
-            display: inline-block; /* Важно: чтобы поворот сработал */
-            transform: rotate(-90deg); /* Поворачиваем на 90 градусов влево */
-            text-shadow: 0 0 5px rgba(0,0,0,0.5); /* Добавляем тень для контраста */
+            display: inline-block;
+            transform: rotate(-90deg); /* Поворот вверх */
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
 
-        /* Эффект пульсации */
+        /* Эффект пульсации вокруг точки */
         .custom-hotspot::before {
             content: '';
             position: absolute;
@@ -49,17 +76,105 @@
             100% { transform: scale(2.5); opacity: 0; }
         }
 
-        /* Центрирование текста подсказки */
+        /* Подсказка (текст над точкой) */
         .pnlm-tooltip span {
-            margin-left: -50px; /* Сдвиг, чтобы текст был по центру */
+            margin-left: -50px;
             width: 100px;
             text-align: center;
-            transform: translateY(-10px);
+            transform: translateY(-15px);
+            background: rgba(0,0,0,0.7) !important;
+            border-radius: 5px !important;
+            padding: 5px !important;
         }
     </style>
 </head>
 <body>
 
+<div id="mute-button" title="Включить/Выключить звук">🔇</div>
+
+<audio id="bg-music" loop>
+    <source src="background.mp3" type="audio/mpeg">
+</audio>
+
+<div id="panorama"></div>
+
+<script>
+// Логика аудиоплеера
+var music = document.getElementById('bg-music');
+var muteBtn = document.getElementById('mute-button');
+
+muteBtn.onclick = function() {
+    if (music.paused) {
+        music.play().catch(function(error) {
+            console.log("Браузер заблокировал автовоспроизведение. Кликните на страницу еще раз.");
+        });
+        muteBtn.innerHTML = '🔊';
+        muteBtn.style.borderColor = '#4CAF50'; // Зеленый ободок при игре
+    } else {
+        music.pause();
+        muteBtn.innerHTML = '🔇';
+        muteBtn.style.borderColor = 'rgba(255, 255, 255, 0.7)';
+    }
+};
+
+// Функция для создания подсказок
+function hotspotTooltip(hotSpotDiv, args) {
+    hotSpotDiv.classList.add('pnlm-tooltip');
+    var span = document.createElement('span');
+    span.innerHTML = args;
+    hotSpotDiv.appendChild(span);
+}
+
+// Инициализация тура
+var viewer = pannellum.viewer('panorama', {   
+    "default": {
+        "firstScene": "main",
+        "autoLoad": true,
+        "sceneFadeDuration": 1200
+    },
+
+    "scenes": {
+        "main": {
+            "title": "Центр Бара",
+            "type": "equirectangular",
+            "panorama": "center.jpg", 
+            "hotSpots": [
+                {
+                    "pitch": -7.3, 
+                    "yaw": 169,    
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspotTooltip,
+                    "createTooltipArgs": "Наш дом 🏠",
+                    "clickHandlerFunc": function() {
+                        viewer.loadScene("park");
+                    }
+                }
+            ]
+        },
+
+        "park": {
+            "title": "Наш дом",
+            "type": "equirectangular",
+            "panorama": "park.jpg",
+            "hotSpots": [
+                {
+                    "pitch": -4.95,
+                    "yaw": 173.3,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspotTooltip,
+                    "createTooltipArgs": "Центр города 🏙️",
+                    "clickHandlerFunc": function() {
+                        viewer.loadScene("main");
+                    }
+                }
+            ]
+        }
+    }
+});
+</script>
+
+</body>
+</html>
 <div id="panorama"></div>
 
 <script>
