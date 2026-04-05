@@ -1,79 +1,60 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Virtual Tour</title>
+    <title>City Tour - Montenegro</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
         #panorama { width: 100%; height: 100vh; }
-        /* Стиль для кнопки перехода (точки) */
-        .custom-hotspot {
-            height: 40px; width: 40px;
-            background: rgba(255,255,255,0.3); border: 2px solid #fff;
-            border-radius: 50%; cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
-        .custom-hotspot:hover { background: rgba(255,255,255,0.8); transform: scale(1.2); }
+        body { margin: 0; }
     </style>
 </head>
 <body>
 
-    <div id="panorama"></div>
+<div id="panorama"></div>
 
-    <script>
-        // Инициализируем плеер с первой панорамой
-        var viewer = pannellum.viewer('panorama', {
+<script>
+pannellum.viewer('panorama', {   
+    "default": {
+        "firstScene": "main",
+        "author": "Yacht Project",
+        "autoLoad": true
+    },
+
+    "scenes": {
+        "main": {
+            "title": "Набережная Бара",
             "type": "equirectangular",
-            "panorama": "center.jpg", // СТАРТОВАЯ ЛОКАЦИЯ
-            "autoLoad": true,
-            "autoRotate": -1, // Медленное вращение для красоты
-            "orientationOnByDefault": true,
-            
-            // ДОБАВЛЯЕМ ТОЧКИ ПЕРЕХОДА (Hotspots)
+            "panorama": "center.jpg", 
             "hotSpots": [
                 {
-                    "pitch": 0,    // Вертикальная координата (-90 до 90)
-                    "yaw": 0,      // Горизонтальная координата (-180 до 180)
-                    "cssClass": "custom-hotspot", // Наш красивый стиль
-                    "createTooltipFunc": function(hotSpotDiv, args) {
-                        hotSpotDiv.classList.add('pnlm-tooltip');
-                        var span = document.createElement('span');
-                        span.innerHTML = "Перейти в Парк 🌳"; // Подсказка при наведении
-                        hotSpotDiv.appendChild(span);
-                    },
-                    // ГЛАВНОЕ ДЕЙСТВИЕ ПРИ КЛИКЕ
-                    "clickHandlerFunc": function() {
-                        viewer.loadScene("park-scene");
-                    }
+                    "pitch": -10.0, // ЗАМЕНИТЕ на ваши цифры из консоли Chrome
+                    "yaw": 45.0,    // ЗАМЕНИТЕ на ваши цифры из консоли Chrome
+                    "type": "scene",
+                    "text": "Перейти в Парк 🌳",
+                    "sceneId": "park" // ID сцены, куда переходим
                 }
             ]
-        });
+        },
 
-        // ОПИСЫВАЕМ ВТОРУЮ СЦЕНУ (Парк)
-        viewer.addScene("park-scene", {
+        "park": {
+            "title": "Городской парк",
             "type": "equirectangular",
             "panorama": "park.jpg",
             "hotSpots": [
-                // Точка для возврата назад
                 {
-                    "pitch": -10, "yaw": 150,
-                    "cssClass": "custom-hotspot",
-                    "createTooltipFunc": function(hotSpotDiv, args) {
-                        hotSpotDiv.classList.add('pnlm-tooltip');
-                        var span = document.createElement('span');
-                        span.innerHTML = "Назад в Центр 🏙️";
-                        hotSpotDiv.appendChild(span);
-                    },
-                    "clickHandlerFunc": function() {
-                        viewer.loadScene("default"); // Загружаем стартовую сцену
-                    }
+                    "pitch": -5.0,
+                    "yaw": 120.0,
+                    "type": "scene",
+                    "text": "Вернуться на набережную 🏙️",
+                    "sceneId": "main"
                 }
             ]
-        });
-    </script>
+        }
+    }
+});
+</script>
+
 </body>
 </html>
