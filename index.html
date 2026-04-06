@@ -31,16 +31,20 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Кастомная точка перехода */
         .custom-hotspot {
-            height: 44px; width: 44px;
+            height: 44px; 
+            width: 44px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 2px solid #fff;
+            position: relative;
         }
 
+        /* Стрелка внутри */
         .custom-hotspot::after {
             content: '➜';
             color: white;
@@ -49,6 +53,7 @@
             transform: rotate(-90deg);
         }
 
+        /* Пульсация */
         .custom-hotspot::before {
             content: '';
             position: absolute;
@@ -60,6 +65,113 @@
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* ПОДПИСЬ НАД СТРЕЛКОЙ */
+        .pnlm-tooltip span {
+            visibility: hidden; /* Скрыта по умолчанию */
+            position: absolute;
+            bottom: 55px; /* Высота над точкой */
+            left: 50%;
+            transform: translateX(-50%);
+            
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #fff !important;
+            padding: 8px 12px !important;
+            border-radius: 6px !important;
+            font-size: 14px !important;
+            white-space: nowrap;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        /* Показываем подпись при наведении на точку */
+        .custom-hotspot:hover .pnlm-tooltip span {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="mute-button">🔇</div>
+
+<audio id="bg-music" loop playsinline preload="auto">
+    <source src="background.mp3" type="audio/mpeg">
+</audio>
+
+<div id="panorama"></div>
+
+<script>
+var music = document.getElementById('bg-music');
+var muteBtn = document.getElementById('mute-button');
+
+muteBtn.addEventListener('click', function() {
+    if (music.paused) {
+        music.play();
+        muteBtn.innerHTML = '🔊';
+        muteBtn.style.backgroundColor = 'rgba(0, 150, 0, 0.7)';
+    } else {
+        music.pause();
+        muteBtn.innerHTML = '🔇';
+        muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    }
+}, false);
+
+function hotspotTooltip(hotSpotDiv, args) {
+    hotSpotDiv.classList.add('pnlm-tooltip');
+    var span = document.createElement('span');
+    span.innerHTML = args;
+    hotSpotDiv.appendChild(span);
+}
+
+var viewer = pannellum.viewer('panorama', {   
+    "default": {
+        "firstScene": "main",
+        "autoLoad": true,
+        "sceneFadeDuration": 1000,
+        "multiResMinReader": true,
+        "hotSpotDebug": true 
+    },
+    "scenes": {
+        "main": {
+            "title": "Центр Бара",
+            "type": "equirectangular",
+            "panorama": "center.jpg", 
+            "hotSpots": [
+                {
+                    "pitch": 0.3885, 
+                    "yaw": 179.7289,    
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspotTooltip,
+                    "createTooltipArgs": "Stari Grad Bar",
+                    "clickHandlerFunc": function() { viewer.loadScene("park"); }
+                }
+            ]
+        },
+        "park": {
+            "title": "Наш дом",
+            "type": "equirectangular",
+            "panorama": "park.jpg",
+            "hotSpots": [
+                {
+                    "pitch": -4.95,
+                    "yaw": 173.3,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspotTooltip,
+                    "createTooltipArgs": "Center",
+                    "clickHandlerFunc": function() { viewer.loadScene("main"); }
+                }
+            ]
+        }
+    }
+});
+</script>
+</body>
+</html>            0% { transform: scale(1); opacity: 1; }
             100% { transform: scale(2.2); opacity: 0; }
         }
 
