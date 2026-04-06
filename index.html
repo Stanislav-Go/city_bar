@@ -10,7 +10,6 @@
         #panorama { width: 100%; height: 100vh; }
         body { margin: 0; padding: 0; font-family: sans-serif; background-color: #000; }
 
-        /* Кнопка звука */
         #mute-button {
             position: absolute;
             top: 20px;
@@ -31,7 +30,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Кастомная точка перехода */
+        /* Точка теперь имеет overflow: visible, чтобы подсказка не исчезала */
         .custom-hotspot {
             height: 44px; 
             width: 44px;
@@ -42,9 +41,9 @@
             justify-content: center;
             border: 2px solid #fff;
             position: relative;
+            overflow: visible; 
         }
 
-        /* Стрелка внутри */
         .custom-hotspot::after {
             content: '➜';
             color: white;
@@ -53,7 +52,6 @@
             transform: rotate(-90deg);
         }
 
-        /* Пульсация */
         .custom-hotspot::before {
             content: '';
             position: absolute;
@@ -68,11 +66,10 @@
             100% { transform: scale(2.2); opacity: 0; }
         }
 
-        /* ПОДПИСЬ НАД СТРЕЛКОЙ */
+        /* Текст подсказки - ВСЕГДА ВИДИМЫЙ НАД ТОЧКОЙ */
         .pnlm-tooltip span {
-            visibility: hidden; /* Скрыта по умолчанию */
             position: absolute;
-            bottom: 55px; /* Высота над точкой */
+            bottom: 55px; 
             left: 50%;
             transform: translateX(-50%);
             
@@ -84,14 +81,9 @@
             white-space: nowrap;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            transition: opacity 0.3s ease;
-            opacity: 0;
-        }
-
-        /* Показываем подпись при наведении на точку */
-        .custom-hotspot:hover .pnlm-tooltip span {
-            visibility: visible;
-            opacity: 1;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
     </style>
 </head>
@@ -143,96 +135,9 @@ var viewer = pannellum.viewer('panorama', {
             "panorama": "center.jpg", 
             "hotSpots": [
                 {
-                    "pitch": 0.3885, 
-                    "yaw": 179.7289,    
-                    "cssClass": "custom-hotspot",
-                    "createTooltipFunc": hotspotTooltip,
-                    "createTooltipArgs": "Stari Grad Bar",
-                    "clickHandlerFunc": function() { viewer.loadScene("park"); }
-                }
-            ]
-        },
-        "park": {
-            "title": "Наш дом",
-            "type": "equirectangular",
-            "panorama": "park.jpg",
-            "hotSpots": [
-                {
-                    "pitch": -4.95,
-                    "yaw": 173.3,
-                    "cssClass": "custom-hotspot",
-                    "createTooltipFunc": hotspotTooltip,
-                    "createTooltipArgs": "Center",
-                    "clickHandlerFunc": function() { viewer.loadScene("main"); }
-                }
-            ]
-        }
-    }
-});
-</script>
-</body>
-</html>            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
-        }
-
-        .pnlm-tooltip span {
-            background: rgba(0,0,0,0.8) !important;
-            color: #fff !important;
-            padding: 8px !important;
-            border-radius: 4px !important;
-        }
-    </style>
-</head>
-<body>
-
-<div id="mute-button">🔇</div>
-
-<audio id="bg-music" loop playsinline preload="auto">
-    <source src="background.mp3" type="audio/mpeg">
-</audio>
-
-<div id="panorama"></div>
-
-<script>
-var music = document.getElementById('bg-music');
-var muteBtn = document.getElementById('mute-button');
-
-muteBtn.addEventListener('click', function() {
-    if (music.paused) {
-        music.play();
-        muteBtn.innerHTML = '🔊';
-        muteBtn.style.backgroundColor = 'rgba(0, 150, 0, 0.7)';
-    } else {
-        music.pause();
-        muteBtn.innerHTML = '🔇';
-        muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    }
-}, false);
-
-function hotspotTooltip(hotSpotDiv, args) {
-    hotSpotDiv.classList.add('pnlm-tooltip');
-    var span = document.createElement('span');
-    span.innerHTML = args;
-    hotSpotDiv.appendChild(span);
-}
-
-var viewer = pannellum.viewer('panorama', {   
-    "default": {
-        "firstScene": "main",
-        "autoLoad": true,
-        "sceneFadeDuration": 1000,
-        "multiResMinReader": true,
-        "hotSpotDebug": true // ВКЛЮЧЕНО: теперь прицел виден и координаты пишутся в консоль
-    },
-    "scenes": {
-        "main": {
-            "title": "Центр Бара",
-            "type": "equirectangular",
-            "panorama": "center.jpg", 
-            "hotSpots": [
-                {
-                    "pitch": 0.3885324428650547, 
-                    "yaw": 179.72898081599294,    
+                    /* Координаты возвращены к тем, что были на успешном скриншоте */
+                    "pitch": -7.3, 
+                    "yaw": 169,    
                     "cssClass": "custom-hotspot",
                     "createTooltipFunc": hotspotTooltip,
                     "createTooltipArgs": "Stari Grad Bar",
