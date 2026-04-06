@@ -30,6 +30,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative; /* Важно для пульсации */
         }
 
         .custom-hotspot::after {
@@ -39,16 +40,32 @@
             transform: rotate(-90deg);
         }
 
-        /* ПОДПИСЬ НАД ТОЧКОЙ */
+        /* --- ВОЗВРАЩАЕМ АНИМАЦИЮ (Новый класс) --- */
+        .hotspot-pulse-layer {
+            position: absolute;
+            top: -2px; /* Выравнивание по border родителя */
+            left: -2px;
+            width: 44px; /* Размер круга */
+            height: 44px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            pointer-events: none; /* Не мешает кликам */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* ПОДПИСЬ НАД ТОЧКОЙ (С сохранением центрирования) */
         .pnlm-tooltip span {
-            /* Фиксируем положение относительно центра кнопки */
             position: absolute !important;
             bottom: 50px !important;
             left: 50% !important;
             
-            /* Жестко задаем ширину и центрируем через отрицательный отступ */
             width: 160px !important;
-            margin-left: -80px !important; /* Ровно половина от 160px */
+            margin-left: -80px !important; /* Четкое центрирование по макету */
             
             background: rgba(0, 0, 0, 0.8) !important;
             color: #fff !important;
@@ -58,7 +75,6 @@
             text-align: center !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             
-            /* Всегда показывать */
             visibility: visible !important;
             opacity: 1 !important;
             display: block !important;
@@ -82,12 +98,20 @@ muteBtn.addEventListener('click', function() {
     else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; }
 }, false);
 
-/* Базовая функция создания тултипа */
-function hotspotTooltip(hotSpotDiv, args) {
+/* Обновленная функция: добавляет и текст, и слой пульсации */
+function hotspotTooltipWithPulse(hotSpotDiv, args) {
+    // 1. Добавляем класс для центрирования текста
     hotSpotDiv.classList.add('pnlm-tooltip');
+    
+    // 2. Создаем сам текст
     var span = document.createElement('span');
     span.innerHTML = args;
     hotSpotDiv.appendChild(span);
+    
+    // 3. Создаем невидимый слой пульсации
+    var pulse = document.createElement('div');
+    pulse.classList.add('hotspot-pulse-layer');
+    hotSpotDiv.appendChild(pulse);
 }
 
 var viewer = pannellum.viewer('panorama', {      
@@ -104,7 +128,7 @@ var viewer = pannellum.viewer('panorama', {
                 {
                     "pitch": 0.3885, "yaw": 179.7289,    
                     "cssClass": "custom-hotspot",
-                    "createTooltipFunc": hotspotTooltip,
+                    "createTooltipFunc": hotspotTooltipWithPulse, // Функция изменена
                     "createTooltipArgs": "Stari Grad Bar",
                     "clickHandlerFunc": function() { viewer.loadScene("park"); }
                 }
@@ -117,7 +141,7 @@ var viewer = pannellum.viewer('panorama', {
                 {
                     "pitch": -4.95, "yaw": 173.3,
                     "cssClass": "custom-hotspot",
-                    "createTooltipFunc": hotspotTooltip,
+                    "createTooltipFunc": hotspotTooltipWithPulse, // Функция изменена
                     "createTooltipArgs": "Center",
                     "clickHandlerFunc": function() { viewer.loadScene("main"); }
                 }
