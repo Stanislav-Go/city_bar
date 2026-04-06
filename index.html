@@ -65,23 +65,23 @@
             100% { transform: scale(2.2); opacity: 0; } 
         } 
 
-        /* Текст подсказки ровно над точкой */
+        /* Текст подсказки строго по центру над точкой */
         .pnlm-tooltip span {
             position: absolute;
-            bottom: 50px;          /* Высота над кругом */
-            left: 50%;             /* Центрирование относительно родителя */
-            width: 140px;          /* Фиксированная ширина для стабильности */
-            margin-left: -70px;    /* Сдвиг влево ровно на половину ширины (140/2) */
+            bottom: 60px;          /* Высота над кругом */
+            left: 50% !important;  /* Привязка к центру точки */
+            transform: translateX(-50%); /* Сдвиг самого текста влево на 50% его ширины */
             
             background: rgba(0, 0, 0, 0.8) !important;
             color: #fff !important;
-            padding: 8px 5px !important;
+            padding: 8px 12px !important;
             border-radius: 6px !important;
             font-size: 14px !important;
+            white-space: nowrap;    /* Текст в одну строку */
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             
-            /* Делаем видимым */
+            /* Гарантируем видимость */
             visibility: visible !important;
             opacity: 1 !important;
             display: block !important;
