@@ -18,15 +18,13 @@
             border: 2px solid #fff; font-size: 24px;
         }
 
-        /* КОНТЕЙНЕР ТОЧКИ (КРУГ СО СТРЕЛКОЙ) */
+        /* ОСНОВНАЯ ТОЧКА (КРУГ) */
         .custom-hotspot {
-            width: 44px; height: 44px;
+            height: 44px; width: 44px;
             background: rgba(255, 255, 255, 0.3);
-            border: 2px solid #fff;
             border-radius: 50%;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
+            border: 2px solid #fff;
+            display: block;
             position: relative;
         }
 
@@ -35,42 +33,51 @@
             content: '➜';
             color: white;
             font-size: 20px;
-            transform: rotate(-90deg);
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            display: block;
         }
 
-        /* ПОДПИСЬ - ТЕПЕРЬ ПРИВЯЗАНА К КРУГУ */
-        /* Мы используем атрибут data-label, чтобы выводить текст */
+        /* ЭФФЕКТ ПУЛЬСАЦИИ */
         .custom-hotspot::before {
-            content: attr(data-label);
+            content: '';
             position: absolute;
-            bottom: 55px;         /* Высота над кругом */
+            top: -2px; left: -2px; /* Выравнивание по границе border */
+            width: 44px; height: 44px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* КОНТЕЙНЕР ДЛЯ ТЕКСТА */
+        /* Мы создаем обертку, которая всегда стоит по центру точки */
+        .label-wrapper {
+            position: absolute;
+            bottom: 55px;
             left: 50%;
-            transform: translateX(-50%);
-            
+            width: 0; 
+            height: 0;
+            display: flex;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .label-text {
             background: rgba(0, 0, 0, 0.8);
             color: #fff;
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 14px;
             white-space: nowrap;
-            text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            pointer-events: none; /* Чтобы текст не мешал клику */
-        }
-
-        /* АНИМАЦИЯ ПУЛЬСАЦИИ (доп. элемент для красоты) */
-        .pulse-effect {
-            position: absolute;
-            width: 100%; height: 100%;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
             pointer-events: none;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
+            transform: translateX(-50%); /* Сдвиг самого текста влево на 50% */
         }
     </style>
 </head>
@@ -91,16 +98,21 @@ muteBtn.addEventListener('click', function() {
     else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; }
 }, false);
 
-/* Функция для создания точки с текстом */
-function createCustomHotspot(hotSpotDiv, args) {
+/* Новая функция создания: текст и стрелка теперь не конфликтуют */
+function hotspotWithLabel(hotSpotDiv, args) {
     hotSpotDiv.classList.add('custom-hotspot');
-    // Записываем текст в атрибут data-label для CSS
-    hotSpotDiv.setAttribute('data-label', args);
     
-    // Добавляем эффект пульсации внутрь
-    var pulse = document.createElement('div');
-    pulse.classList.add('pulse-effect');
-    hotSpotDiv.appendChild(pulse);
+    // Создаем обертку для текста
+    var wrapper = document.createElement('div');
+    wrapper.classList.add('label-wrapper');
+    
+    // Создаем сам текст
+    var span = document.createElement('div');
+    span.classList.add('label-text');
+    span.innerHTML = args;
+    
+    wrapper.appendChild(span);
+    hotSpotDiv.appendChild(wrapper);
 }
 
 var viewer = pannellum.viewer('panorama', {      
@@ -116,9 +128,8 @@ var viewer = pannellum.viewer('panorama', {
             "panorama": "center.jpg", 
             "hotSpots": [
                 {
-                    "pitch": 0.3885, 
-                    "yaw": 179.7289,    
-                    "createTooltipFunc": createCustomHotspot,
+                    "pitch": 0.3885, "yaw": 179.7289,    
+                    "createTooltipFunc": hotspotWithLabel,
                     "createTooltipArgs": "Stari Grad Bar",
                     "clickHandlerFunc": function() { viewer.loadScene("park"); }
                 }
@@ -129,9 +140,8 @@ var viewer = pannellum.viewer('panorama', {
             "panorama": "park.jpg",
             "hotSpots": [
                 {
-                    "pitch": -4.95,
-                    "yaw": 173.3,
-                    "createTooltipFunc": createCustomHotspot,
+                    "pitch": -4.95, "yaw": 173.3,
+                    "createTooltipFunc": hotspotWithLabel,
                     "createTooltipArgs": "Center",
                     "clickHandlerFunc": function() { viewer.loadScene("main"); }
                 }
