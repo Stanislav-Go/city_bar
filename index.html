@@ -19,25 +19,35 @@
             border: 2px solid #fff; font-size: 24px;
         }
 
-        /* ТОЧКА ПЕРЕХОДА */
+        /* КОНТЕЙНЕР ТОЧКИ */
         .custom-hotspot {
             height: 44px; width: 44px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
             border: 2px solid #fff;
+            
+            /* Ключевое исправление: флекс-контейнер */
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
+        /* СТРЕЛКА ВНУТРИ */
         .custom-hotspot::after {
             content: '➜'; color: white; font-size: 20px;
-            display: inline-block; transform: rotate(-90deg);
+            display: block; transform: rotate(-90deg);
+            pointer-events: none;
         }
 
+        /* АНИМАЦИЯ */
         .custom-hotspot::before {
             content: ''; position: absolute;
             width: 100%; height: 100%;
             border: 2px solid #fff; border-radius: 50%;
             animation: pulse 2s infinite;
+            pointer-events: none;
         }
 
         @keyframes pulse {
@@ -45,34 +55,34 @@
             100% { transform: scale(2.2); opacity: 0; }
         }
 
-        /* ИДЕАЛЬНАЯ ПОДПИСЬ НАД ТОЧКОЙ */
-        /* Мы переопределяем стандартный тултип Pannellum */
-        .pnlm-hotspot-base:hover .pnlm-tooltip span, 
+        /* ПОДПИСЬ НАД ТОЧКОЙ */
         .pnlm-tooltip span {
-            text-indent: 0; /* Сброс стандартных отступов библиотеки */
-            margin-left: 0;
-            transform: translateX(-50%); /* Центрирование */
-            left: 50%;
-            bottom: 55px; /* Высота над стрелкой */
+            /* Убираем абсолютное позиционирование, используем отступ от центра */
+            position: absolute !important;
+            bottom: 55px !important; 
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            
+            /* Сбрасываем стандартные косяки Pannellum */
+            text-indent: 0 !important;
+            margin: 0 !important;
             
             background: rgba(0, 0, 0, 0.8) !important;
             color: #fff !important;
             padding: 8px 12px !important;
             border-radius: 6px !important;
             font-size: 14px !important;
-            white-space: nowrap;
-            text-align: center;
+            white-space: nowrap !important;
+            text-align: center !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             
-            /* Сделать видимой сразу */
             visibility: visible !important;
             opacity: 1 !important;
+            display: block !important;
         }
 
-        /* Убираем стандартный треугольник-стрелочку тултипа */
-        .pnlm-tooltip span::after {
-            display: none !important;
-        }
+        /* Убираем лишние элементы библиотеки */
+        .pnlm-tooltip span::after { display: none !important; }
     </style>
 </head>
 <body>
@@ -92,7 +102,6 @@ muteBtn.addEventListener('click', function() {
     else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; }
 }, false);
 
-// Оставляем вашу функцию создания тултипа, она работает верно
 function hotspotTooltip(hotSpotDiv, args) {
     hotSpotDiv.classList.add('pnlm-tooltip');
     var span = document.createElement('span');
