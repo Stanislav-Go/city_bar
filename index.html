@@ -1,69 +1,60 @@
-<!DOCTYPE html> 
-<html> 
-<head> 
-    <meta charset="utf-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
-    <title>City Tour - Bar</title> 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/> 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script> 
-    <style> 
-        #panorama { width: 100%; height: 100vh; } 
-        body { margin: 0; padding: 0; font-family: sans-serif; background-color: #000; } 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>City Tour - Bar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        #panorama { width: 100%; height: 100vh; }
+        body { margin: 0; padding: 0; font-family: sans-serif; background-color: #000; }
 
-        /* Кнопка звука */ 
-        #mute-button { 
-            position: absolute; 
-            top: 20px; right: 20px; 
-            z-index: 1000; 
-            background: rgba(0, 0, 0, 0.7); 
-            color: white; 
-            padding: 15px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            width: 50px; height: 50px; 
-            display: flex; align-items: center; justify-content: center; 
-            border: 2px solid #fff; 
-            font-size: 24px; 
-        } 
-
-        /* СТИЛЬ СТРЕЛКИ (без встроенного текста) */
-        .custom-hotspot { 
-            height: 44px; width: 44px; 
-            background: rgba(255, 255, 255, 0.3); 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            border: 2px solid #fff; 
-        } 
-
-        .custom-hotspot::after { 
-            content: '➜'; 
-            color: white; 
-            font-size: 20px; 
-            display: inline-block; 
-            transform: rotate(-90deg); 
-        } 
-
-        .custom-hotspot::before { 
-            content: ''; 
-            position: absolute; 
-            width: 100%; height: 100%; 
-            border: 2px solid #fff; 
-            border-radius: 50%; 
-            animation: pulse 2s infinite; 
-        } 
-
-        @keyframes pulse { 
-            0% { transform: scale(1); opacity: 1; } 
-            100% { transform: scale(2.2); opacity: 0; } 
-        } 
-
-        /* СТИЛЬ ДЛЯ ТЕКСТА (отдельная точка) */
-        .text-only-hotspot {
-            background: none !important;
-            border: none !important;
+        /* Кнопка звука */
+        #mute-button {
+            position: absolute; top: 20px; right: 20px; z-index: 1000;
+            background: rgba(0, 0, 0, 0.7); color: white; padding: 15px;
+            border-radius: 50%; cursor: pointer; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fff; font-size: 24px;
         }
 
-        .text-only-hotspot span {
+        /* ТОЧКА ПЕРЕХОДА */
+        .custom-hotspot {
+            height: 44px; width: 44px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fff;
+        }
+
+        .custom-hotspot::after {
+            content: '➜'; color: white; font-size: 20px;
+            display: inline-block; transform: rotate(-90deg);
+        }
+
+        .custom-hotspot::before {
+            content: ''; position: absolute;
+            width: 100%; height: 100%;
+            border: 2px solid #fff; border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* ИДЕАЛЬНАЯ ПОДПИСЬ НАД ТОЧКОЙ */
+        /* Мы переопределяем стандартный тултип Pannellum */
+        .pnlm-hotspot-base:hover .pnlm-tooltip span, 
+        .pnlm-tooltip span {
+            text-indent: 0; /* Сброс стандартных отступов библиотеки */
+            margin-left: 0;
+            transform: translateX(-50%); /* Центрирование */
+            left: 50%;
+            bottom: 55px; /* Высота над стрелкой */
+            
             background: rgba(0, 0, 0, 0.8) !important;
             color: #fff !important;
             padding: 8px 12px !important;
@@ -73,84 +64,80 @@
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             
-            /* Магия центрирования */
-            position: absolute;
-            transform: translate(-50%, -50%); /* Текст центруется ровно по своим координатам */
-            display: block !important;
+            /* Сделать видимой сразу */
             visibility: visible !important;
+            opacity: 1 !important;
         }
-    </style> 
-</head> 
-<body> 
 
-<div id="mute-button">🔇</div> 
-<audio id="bg-music" loop playsinline preload="auto"> 
-    <source src="background.mp3" type="audio/mpeg"> 
-</audio> 
-<div id="panorama"></div> 
+        /* Убираем стандартный треугольник-стрелочку тултипа */
+        .pnlm-tooltip span::after {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
 
-<script> 
-var music = document.getElementById('bg-music'); 
-var muteBtn = document.getElementById('mute-button'); 
+<div id="mute-button">🔇</div>
+<audio id="bg-music" loop playsinline preload="auto">
+    <source src="background.mp3" type="audio/mpeg">
+</audio>
+<div id="panorama"></div>
 
-muteBtn.addEventListener('click', function() { 
-    if (music.paused) { music.play(); muteBtn.innerHTML = '🔊'; muteBtn.style.backgroundColor = 'rgba(0, 150, 0, 0.7)'; } 
-    else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; } 
-}, false); 
+<script>
+var music = document.getElementById('bg-music');
+var muteBtn = document.getElementById('mute-button');
 
-function hotspotTooltip(hotSpotDiv, args) { 
-    hotSpotDiv.classList.add('pnlm-tooltip'); 
-    var span = document.createElement('span'); 
-    span.innerHTML = args; 
-    hotSpotDiv.appendChild(span); 
-} 
+muteBtn.addEventListener('click', function() {
+    if (music.paused) { music.play(); muteBtn.innerHTML = '🔊'; muteBtn.style.backgroundColor = 'rgba(0, 150, 0, 0.7)'; }
+    else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; }
+}, false);
 
-var viewer = pannellum.viewer('panorama', {       
-    "default": { 
-        "firstScene": "main", 
-        "autoLoad": true, 
-        "sceneFadeDuration": 1000, 
-        "hotSpotDebug": true 
-    }, 
-    "scenes": { 
-        "main": { 
-            "title": "Центр Бара", 
-            "panorama": "center.jpg",  
-            "hotSpots": [ 
+// Оставляем вашу функцию создания тултипа, она работает верно
+function hotspotTooltip(hotSpotDiv, args) {
+    hotSpotDiv.classList.add('pnlm-tooltip');
+    var span = document.createElement('span');
+    span.innerHTML = args;
+    hotSpotDiv.appendChild(span);
+}
+
+var viewer = pannellum.viewer('panorama', {      
+    "default": {
+        "firstScene": "main",
+        "autoLoad": true,
+        "sceneFadeDuration": 1000,
+        "hotSpotDebug": true
+    },
+    "scenes": {
+        "main": {
+            "title": "Центр Бара",
+            "panorama": "center.jpg", 
+            "hotSpots": [
                 {
-                    /* СТРЕЛКА */
-                    "pitch": 0.3885, "yaw": 179.7289,     
-                    "cssClass": "custom-hotspot", 
-                    "clickHandlerFunc": function() { viewer.loadScene("park"); } 
-                },
-                {
-                    /* ТЕКСТ (Pitch чуть больше, чтобы поднять выше стрелки) */
-                    "pitch": 3.5, "yaw": 179.7289,
-                    "cssClass": "text-only-hotspot",
+                    "pitch": 0.3885, 
+                    "yaw": 179.7289,    
+                    "cssClass": "custom-hotspot",
                     "createTooltipFunc": hotspotTooltip,
-                    "createTooltipArgs": "Stari Grad Bar"
+                    "createTooltipArgs": "Stari Grad Bar",
+                    "clickHandlerFunc": function() { viewer.loadScene("park"); }
                 }
-            ] 
-        }, 
-        "park": { 
-            "title": "Наш дом", 
-            "panorama": "park.jpg", 
-            "hotSpots": [ 
+            ]
+        },
+        "park": {
+            "title": "Наш дом",
+            "panorama": "park.jpg",
+            "hotSpots": [
                 {
-                    "pitch": -4.95, "yaw": 173.3, 
-                    "cssClass": "custom-hotspot", 
-                    "clickHandlerFunc": function() { viewer.loadScene("main"); } 
-                },
-                {
-                    "pitch": -1.5, "yaw": 173.3,
-                    "cssClass": "text-only-hotspot",
+                    "pitch": -4.95,
+                    "yaw": 173.3,
+                    "cssClass": "custom-hotspot",
                     "createTooltipFunc": hotspotTooltip,
-                    "createTooltipArgs": "Center"
+                    "createTooltipArgs": "Center",
+                    "clickHandlerFunc": function() { viewer.loadScene("main"); }
                 }
-            ] 
-        } 
-    } 
-}); 
-</script> 
-</body> 
+            ]
+        }
+    }
+});
+</script>
+</body>
 </html>
