@@ -30,7 +30,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            position: relative;
         }
 
         /* СТРЕЛКА */
@@ -43,6 +42,7 @@
         }
 
         /* АНИМАЦИЯ ПУЛЬСАЦИИ */
+        /* Используем before самого хотспота, это надежнее всего */
         .custom-hotspot::before {
             content: '';
             position: absolute;
@@ -60,14 +60,15 @@
         }
 
         /* НАДПИСЬ ТЕКСТА */
+        /* Мы используем стандартный класс тултипа, чтобы Pannellum его не игнорировал */
         .pnlm-tooltip span {
             position: absolute !important;
-            bottom: 55px !important; 
+            bottom: 55px !important; /* Высота над кнопкой */
             left: 50% !important;
             
+            /* Центрирование через фиксированную ширину и margin */
             width: 180px !important;
-            /* Сдвинул левее: было -90px, поставил -95px */
-            margin-left: -95px !important;
+            margin-left: -90px !important;
             
             background: rgba(0, 0, 0, 0.8) !important;
             color: #fff !important;
@@ -77,12 +78,14 @@
             text-align: center !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             
+            /* Всегда на виду */
             visibility: visible !important;
             opacity: 1 !important;
             display: block !important;
             text-indent: 0 !important;
         }
 
+        /* Убираем лишний треугольник тултипа */
         .pnlm-tooltip span::after {
             display: none !important;
         }
@@ -105,6 +108,7 @@ muteBtn.addEventListener('click', function() {
     else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; }
 }, false);
 
+/* Возвращаемся к максимально простой функции создания тултипа */
 function hotspotTooltip(hotSpotDiv, args) {
     hotSpotDiv.classList.add('pnlm-tooltip');
     var span = document.createElement('span');
@@ -117,7 +121,7 @@ var viewer = pannellum.viewer('panorama', {
         "firstScene": "main",
         "autoLoad": true,
         "sceneFadeDuration": 1000,
-        "hotSpotDebug": true // Отладка включена
+        "hotSpotDebug": true
     },
     "scenes": {
         "main": {
