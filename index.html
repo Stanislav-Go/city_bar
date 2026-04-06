@@ -10,6 +10,7 @@
         #panorama { width: 100%; height: 100vh; }
         body { margin: 0; padding: 0; font-family: sans-serif; background-color: #000; }
 
+        /* Кнопка звука */
         #mute-button {
             position: absolute; top: 20px; right: 20px; z-index: 1000;
             background: rgba(0, 0, 0, 0.7); color: white; padding: 15px;
@@ -18,66 +19,49 @@
             border: 2px solid #fff; font-size: 24px;
         }
 
-        /* ОСНОВНАЯ ТОЧКА (КРУГ) */
+        /* КРУГ СО СТРЕЛКОЙ (Сама точка) */
         .custom-hotspot {
-            height: 44px; width: 44px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border: 2px solid #fff;
-            display: block;
-            position: relative;
+            height: 44px !important; 
+            width: 44px !important;
+            background: rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            border: 2px solid #fff !important;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* СТРЕЛКА ВНУТРИ */
         .custom-hotspot::after {
             content: '➜';
             color: white;
             font-size: 20px;
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-90deg);
-            display: block;
+            transform: rotate(-90deg);
         }
 
-        /* ЭФФЕКТ ПУЛЬСАЦИИ */
-        .custom-hotspot::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; /* Выравнивание по границе border */
-            width: 44px; height: 44px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
-        }
-
-        /* КОНТЕЙНЕР ДЛЯ ТЕКСТА */
-        /* Мы создаем обертку, которая всегда стоит по центру точки */
-        .label-wrapper {
-            position: absolute;
-            bottom: 55px;
-            left: 50%;
-            width: 0; 
-            height: 0;
-            display: flex;
-            justify-content: center;
-            overflow: visible;
-        }
-
-        .label-text {
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            white-space: nowrap;
+        /* ПОДПИСЬ НАД ТОЧКОЙ */
+        .pnlm-tooltip span {
+            /* Фиксируем положение относительно центра кнопки */
+            position: absolute !important;
+            bottom: 50px !important;
+            left: 50% !important;
+            
+            /* Жестко задаем ширину и центрируем через отрицательный отступ */
+            width: 160px !important;
+            margin-left: -80px !important; /* Ровно половина от 160px */
+            
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #fff !important;
+            padding: 8px 5px !important;
+            border-radius: 6px !important;
+            font-size: 14px !important;
+            text-align: center !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            pointer-events: none;
-            transform: translateX(-50%); /* Сдвиг самого текста влево на 50% */
+            
+            /* Всегда показывать */
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: block !important;
         }
     </style>
 </head>
@@ -98,29 +82,19 @@ muteBtn.addEventListener('click', function() {
     else { music.pause(); muteBtn.innerHTML = '🔇'; muteBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; }
 }, false);
 
-/* Новая функция создания: текст и стрелка теперь не конфликтуют */
-function hotspotWithLabel(hotSpotDiv, args) {
-    hotSpotDiv.classList.add('custom-hotspot');
-    
-    // Создаем обертку для текста
-    var wrapper = document.createElement('div');
-    wrapper.classList.add('label-wrapper');
-    
-    // Создаем сам текст
-    var span = document.createElement('div');
-    span.classList.add('label-text');
+/* Базовая функция создания тултипа */
+function hotspotTooltip(hotSpotDiv, args) {
+    hotSpotDiv.classList.add('pnlm-tooltip');
+    var span = document.createElement('span');
     span.innerHTML = args;
-    
-    wrapper.appendChild(span);
-    hotSpotDiv.appendChild(wrapper);
+    hotSpotDiv.appendChild(span);
 }
 
 var viewer = pannellum.viewer('panorama', {      
     "default": {
         "firstScene": "main",
         "autoLoad": true,
-        "sceneFadeDuration": 1000,
-        "hotSpotDebug": true
+        "sceneFadeDuration": 1000
     },
     "scenes": {
         "main": {
@@ -129,7 +103,8 @@ var viewer = pannellum.viewer('panorama', {
             "hotSpots": [
                 {
                     "pitch": 0.3885, "yaw": 179.7289,    
-                    "createTooltipFunc": hotspotWithLabel,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspotTooltip,
                     "createTooltipArgs": "Stari Grad Bar",
                     "clickHandlerFunc": function() { viewer.loadScene("park"); }
                 }
@@ -141,7 +116,8 @@ var viewer = pannellum.viewer('panorama', {
             "hotSpots": [
                 {
                     "pitch": -4.95, "yaw": 173.3,
-                    "createTooltipFunc": hotspotWithLabel,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspotTooltip,
                     "createTooltipArgs": "Center",
                     "clickHandlerFunc": function() { viewer.loadScene("main"); }
                 }
